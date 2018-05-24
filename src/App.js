@@ -7,7 +7,8 @@ const canvasHeight = 630;
 
 class GraphView extends Component {
   state = {
-    ctx: null
+    ctx: null,
+    colors: ['#3498db', '#9b59b6', '#2ecc71', '#e74c3c', '#fd79a8', '#e17055']
   };
 
   componentDidMount() {
@@ -34,7 +35,7 @@ class GraphView extends Component {
     }
 
     this.clearCanvas(ctx);
-    this.initGraph(ctx);
+    this.renderGraph(ctx);
   };
 
   clearCanvas = (ctx) => {
@@ -42,34 +43,41 @@ class GraphView extends Component {
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
   };
 
-  initGraph = (ctx) => {
+  renderGraph = (ctx) => {
     const { graph } = this.props;
 
-    graph.randomize(5, 4, 150, 0.6);
-
     graph.vertexes.forEach((v) => {
-      this.drawCircle(v);
-      v.edges.forEach(this.drawLine(ctx, v));
+      graph.bfs.call(graph, v); // use call to bind "this" context to graph inside bfs
+    });
+
+    const connectedComponents = graph.getConnectedComponents();
+
+    connectedComponents.forEach((component, idx) => {
+      component.forEach((v) => {
+        this.drawCircle(v, idx);
+        v.edges.forEach(this.drawLine(v, idx));
+      });
     });
   };
 
-  drawCircle = ({ pos, value }) => {
-    const { ctx } = this.state;
+  drawCircle = ({ pos, value }, idx) => {
+    const { ctx, colors } = this.state;
     const { x } = pos;
     const { y } = pos;
     const radius = 20;
 
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = colors[idx];
     ctx.font = '16px Arial';
     ctx.fillText(value, x, y, 50);
     ctx.lineWidth = 1;
-    ctx.strokeStyle = '#003300';
+    ctx.strokeStyle = colors[idx];
     ctx.stroke();
   };
 
-  drawLine = (ctx, v) => (e) => {
+  drawLine = (v, idx) => (e) => {
+    const { ctx } = this.state;
     const { destination } = e;
 
     ctx.beginPath();
@@ -88,15 +96,36 @@ class GraphView extends Component {
 
 class App extends Component {
   state = {
-    graph: new Graph()
+    graph: new Graph(),
+    width: 5,
+    height: 4,
+    pxBox: 150,
+    probability: 0.6
   };
 
-  // !!! IMPLEMENT ME
-  // use the graph randomize() method
+  componentDidMount() {
+    this.initGraph();
+  }
+
+  handleClick = () => {
+    const { graph } = this.state;
+
+    graph.resetGraph();
+    this.initGraph();
+  };
+
+  initGraph = () => {
+    const { graph, width, height, pxBox, probability } = this.state;
+
+    graph.randomize(width, height, pxBox, probability);
+
+    this.setState({ graph });
+  };
 
   render() {
     return (
       <div className="App">
+        <button onClick={this.handleClick}>Randomize</button>
         <GraphView graph={this.state.graph} />
       </div>
     );

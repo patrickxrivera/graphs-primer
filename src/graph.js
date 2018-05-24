@@ -1,44 +1,41 @@
-/**
- * Edge
- */
+// https://msdn.microsoft.com/en-us/library/aa289150(v=vs.71).aspx
+/* eslint-disable global-require */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-trailing-spaces */
+/* eslint-disable no-unused-expressions */
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-underscore-dangle */
+
 export class Edge {
-  // !!! IMPLEMENT ME
   constructor(destination, weight = 0.2) {
     this.destination = destination;
     this.weight = weight;
   }
 }
 
-/**
- * Vertex
- */
 export class Vertex {
-  // !!! IMPLEMENT ME
-  constructor() {
+  constructor(value = null) {
+    this.value = value;
     this.edges = [];
-    this.value = null;
-    this.pos = { x: null, y: null };
+    this.isVisited = 'white';
+    this.pos = {
+      x: null,
+      y: null
+    };
   }
 }
 
-/**
- * Graph
- */
 export class Graph {
   constructor() {
     this.vertexes = [];
+    this.connectedComponents = [];
+    this.seen = {};
   }
 
   /**
    * Create a random graph
    */
   randomize(width, height, pxBox, probability = 0.6) {
-    // Helper function to set up two-way edges
-    function connectVerts(v0, v1) {
-      v0.edges.push(new Edge(v1));
-      v1.edges.push(new Edge(v0));
-    }
-
     let count = 0;
 
     // Build a grid of verts
@@ -60,14 +57,14 @@ export class Graph {
         // Connect down
         if (y < height - 1) {
           if (Math.random() < probability) {
-            connectVerts(grid[y][x], grid[y + 1][x]);
+            this._connectVerts(grid[y][x], grid[y + 1][x]);
           }
         }
 
         // Connect right
         if (x < width - 1) {
           if (Math.random() < probability) {
-            connectVerts(grid[y][x], grid[y][x + 1]);
+            this._connectVerts(grid[y][x], grid[y][x + 1]);
           }
         }
       }
@@ -115,17 +112,54 @@ export class Graph {
     }
   }
 
-  /**
-   * BFS
-   */
   bfs(start) {
-    // !!! IMPLEMENT ME
+    const queue = [start];
+    let cache = [];
+
+    if (!this.seen[start.value]) {
+      cache.push(start);
+      this.seen[start.value] = true;
+    }
+
+    while (queue.length > 0) {
+      const currVertex = queue.shift();
+
+      if (currVertex.isVisited === 'black') continue;
+
+      currVertex.isVisited = 'black';
+
+      currVertex.edges.forEach(({ destination }) => {
+        if (destination.isVisited === 'white') {
+          destination.isVisited = 'grey';
+          queue.push(destination);
+
+          if (!this.seen[destination.value]) {
+            cache.push(destination);
+            this.seen[destination.value] = true;
+          }
+        }
+      });
+    }
+    this.connectedComponents.push(cache);
   }
 
-  /**
-   * Get the connected components
-   */
   getConnectedComponents() {
-    // !!! IMPLEMENT ME
+    return this.connectedComponents.filter(this._isValidArray);
+  }
+
+  resetGraph() {
+    this.vertexes = [];
+    this.connectedComponents = [];
+    this.seen = {};
+  }
+
+  _isValidArray(arr) {
+    return arr.length !== 0;
+  }
+
+  // Helper function to set up two-way edges
+  _connectVerts(v0, v1) {
+    v0.edges.push(new Edge(v1));
+    v1.edges.push(new Edge(v0));
   }
 }
