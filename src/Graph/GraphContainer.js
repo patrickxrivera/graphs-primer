@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-class GraphView extends Component {
+class GraphContainer extends Component {
   state = {
     ctx: null,
     colors: ['#3498db', '#9b59b6', '#2ecc71', '#e74c3c', '#fd79a8', '#e17055'],
@@ -98,4 +98,4 @@ class GraphView extends Component {
   }
 }
 
-export default GraphView;
+export default GraphContainer;
