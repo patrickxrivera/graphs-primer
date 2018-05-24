@@ -32,7 +32,7 @@ class AppContainer extends Component {
   };
 
   render() {
-    return <App onClick={this.handleClick} graph={this.state.graph} />;
+    return <App handleClick={this.handleClick} graph={this.state.graph} />;
   }
 }
 

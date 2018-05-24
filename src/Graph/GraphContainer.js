@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 
+import * as Style from './GraphStyles';
+import './styles.css';
+
 class GraphContainer extends Component {
   state = {
     ctx: null,
