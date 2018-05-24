@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
-import { Graph } from './graph';
-import './App.css';
-
-const canvasWidth = 780;
-const canvasHeight = 630;
 
 class GraphView extends Component {
   state = {
     ctx: null,
-    colors: ['#3498db', '#9b59b6', '#2ecc71', '#e74c3c', '#fd79a8', '#e17055']
+    colors: ['#3498db', '#9b59b6', '#2ecc71', '#e74c3c', '#fd79a8', '#e17055'],
+    canvasWidth: 780,
+    canvasHeight: 610
   };
 
   componentDidMount() {
@@ -40,7 +37,7 @@ class GraphView extends Component {
 
   clearCanvas = (ctx) => {
     ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    ctx.fillRect(0, 0, this.state.canvasWidth, this.state.canvasHeight);
   };
 
   renderGraph = (ctx) => {
@@ -90,46 +87,15 @@ class GraphView extends Component {
    * Render
    */
   render() {
-    return <canvas className="canvas" ref="canvas" width={canvasWidth} height={canvasHeight} />;
-  }
-}
-
-class App extends Component {
-  state = {
-    graph: new Graph(),
-    width: 5,
-    height: 4,
-    pxBox: 150,
-    probability: 0.6
-  };
-
-  componentDidMount() {
-    this.initGraph();
-  }
-
-  handleClick = () => {
-    const { graph } = this.state;
-
-    graph.resetGraph();
-    this.initGraph();
-  };
-
-  initGraph = () => {
-    const { graph, width, height, pxBox, probability } = this.state;
-
-    graph.randomize(width, height, pxBox, probability);
-
-    this.setState({ graph });
-  };
-
-  render() {
     return (
-      <div className="App">
-        <button onClick={this.handleClick}>Randomize</button>
-        <GraphView graph={this.state.graph} />
-      </div>
+      <canvas
+        className="canvas"
+        ref="canvas"
+        width={this.state.canvasWidth}
+        height={this.state.canvasHeight}
+      />
     );
   }
 }
 
-export default App;
+export default GraphView;
